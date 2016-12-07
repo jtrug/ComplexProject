@@ -1,4 +1,6 @@
 /**
+  * Nick Trfz
+  * Jared Bartrug
   * Created by chrx on 12/6/16.
   */
 object Application {
