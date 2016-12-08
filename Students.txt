@@ -1,2 +1,4 @@
 John 800092222 math (math,90)
-
+nick 3333 math,history (math,100);(history,95)
+jj 33 h (h,9)
+d 4 d (d,6)
