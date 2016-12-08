@@ -189,12 +189,10 @@ object Application {
     val tClass = StdIn.readLine()
         val tClassArr = Array(tClass)
 
-        val newTeach = new Teacher(tName, tClassArr)
-        val newTeachArray = Array(newTeach)
-        teachers.copyToArray(newTeachArray)
+         teachers += new Teacher(tName, tClassArr)
 
-        save(students, newTeachArray, classes)
-        MainMenu(students, newTeachArray, classes)
+        save(students, teachers, classes)
+        MainMenu(students, teachers, classes)
     }
   }
 
