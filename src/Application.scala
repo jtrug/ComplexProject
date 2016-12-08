@@ -15,74 +15,7 @@ object Application {
     MainMenu(students, teachers, classes)
   }
 
-  def save(student: Array[Student], teacher: Array[Teacher], classes: Array[Classes]): Unit = {
-    val writerS = new PrintWriter(new File("Students.txt"))
-    val writerT = new PrintWriter(new File("Teachers.txt"))
-    val writerC = new PrintWriter(new File("Classes.txt"))
-    for (s <- student) {
-      val tempStr = s.name + " " + s.id.toString + " " + s.classes.mkString(",") + " " + s.grades.toList.mkString(", ") + "\n"
-      writerS.write(tempStr)
-    }
-    writerS.close()
-    for (c <- classes) {
-      val tempStr = c.name + " " + c.teacher + " " + c.students.mkString(",") + " " + c.grades.toList.mkString(", ") + "\n"
-      writerC.write(tempStr)
-    }
-    writerC.close()
-    for (t <- teacher) {
-      val tempStr = t.name + " " + t.classes.mkString(",") + "\n"
-      writerT.write(tempStr)
-    }
-    writerT.close()
-
-  }
-
-  def load() = {
-    // Loading function loads all the students teachers and classes from file
-    //Opening up the respective files
-    val studentInfo = Source.fromFile("Students.txt").getLines().toList
-    val students = ArrayBuffer[Student]()
-
-    val teacherInfo = Source.fromFile("Teachers.txt").getLines().toList
-    val teachers = ArrayBuffer[Teacher]()
-
-    val classInfo = Source.fromFile("Classes.txt").getLines().toList
-    val classes = ArrayBuffer[Classes]()
-
-    for (i <- studentInfo) {
-      val info = i.split(" ")
-      val values = info(3).split(", ")
-      val m = scala.collection.mutable.Map[String, Int]()
-      for (i <- values) {
-        val key = i.substring(1, i.length - 1).split(",")
-        m(key(0)) = key(1).toInt
-      }
-      students += new Student(info(0), info(1).toInt, info(2).split(","), m)
-    }
-
-    for (i <- teacherInfo) {
-      val info = i.split(" ")
-      val name = info(0)
-      val classes = info(1).split(",")
-      teachers += Teacher(name, classes)
-    }
-
-
-    for (i <- classInfo) {
-      val info = i.split(" ")
-      val values = info(3).split(", ")
-      val m = scala.collection.mutable.Map[String, Int]()
-      for (i <- values) {
-
-        val key = i.substring(1, i.length - 1).split(",")
-        m(key(0)) = key(1).toInt
-      }
-      classes += new Classes(info(0), info(1), info(2).split(","), m)
-    }
-    (students.toArray, teachers.toArray, classes.toArray)
-  }
-
-  def MainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+  def MainMenu(students:ArrayBuffer[Student],teachers:ArrayBuffer[Teacher],classes:ArrayBuffer[Classes]): Unit = {
     println("School Database")
     println("Please select a menu to enter\n0: Exit Program\n1:Student\n2: Class\n3:Teacher")
     val choice = StdIn.readInt()
@@ -103,8 +36,7 @@ object Application {
         println("Invalid choice exiting")
     }
   }
-
-  def StudentMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+  def StudentMainMenu(students:ArrayBuffer[Student],teachers:ArrayBuffer[Teacher],classes:ArrayBuffer[Classes]): Unit = {
     var firstChoice = 0
     var secondChoice = 0
     var getOutOfWhileLoop = false
@@ -121,27 +53,49 @@ object Application {
         case 1 =>
           //Search by name
           getOutOfWhileLoop = true
-          println("Search for a Name: ")
-          var name = StdIn.readLine()
-
+          println("Search by a Name: ")
+          var search = StdIn.readLine()
+          var results = students.filter(_.name==search)
+          results.foreach(PrintStudent(_))
         case 2 =>
           // Search by ID
           getOutOfWhileLoop = true
-
+          println("Search by an ID: ")
+          var search = StdIn.readInt()
+          var results = students.filter(_.id==search)
+          results.foreach(PrintStudent(_))
         case 3 =>
           // Show all students
           getOutOfWhileLoop = true
-
+          students.foreach(PrintStudent(_))
+        case 4 =>
+          // add student
+          getOutOfWhileLoop = true
+          println("Please enter the students name")
+          val name = StdIn.readLine()
+          println("Please enter the students id")
+          val id = StdIn.readInt()
+          println("Please enter the students classes seperated by commas")
+          val classes = StdIn.readLine().trim.split(" *, *")
+          val m = scala.collection.mutable.Map[String, Int]()
+          classes.foreach{
+            x=>print("Please enter the grade for "+x)
+              m(x) = StdIn.readInt()
+          }
+          val temp = new Student(name,id,classes,m)
+          students += temp
+          PrintStudent(temp)
         case _ =>
           println("Invalid choice.")
           getOutOfWhileLoop = false
       }
     }
-    println("-1: Exit Program \n0: Return to main menu")
-    /** Print the results */
+    println("-1: Exit Program \n0: Return to main menu\n1:Return to Student Menu")
+    /*
+  Print the results
+   */
 
-
-    print("Select an option or student to view")
+    print("Select an option")
     secondChoice = StdIn.readInt()
 
     if (secondChoice == 0) {
@@ -155,7 +109,7 @@ object Application {
       sys.exit()
     }
     else {
-      PrintStudent(students(secondChoice))
+      StudentMainMenu(students,teachers,classes)
 
     }
 
@@ -176,7 +130,7 @@ object Application {
     println(clasz.grades)
   }
 
-  def ClassMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+  def ClassMainMenu(students: ArrayBuffer[Student], teachers: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
     println("Select an option: ")
     println("0: Main Menu \n1: Search for a class \n2: View All Classes")
     val option = StdIn.readInt()
@@ -210,7 +164,7 @@ object Application {
     } // end of while loop
   }
 
-  def TeacherMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+  def TeacherMainMenu(students: ArrayBuffer[Student], teachers: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
     println("Select an option: ")
     println("0: Return to Main Menu \n1: Search for Teacher by name \n2: View all Teachers \n3: Add a teacher")
     val selection = StdIn.readInt()
@@ -244,9 +198,81 @@ object Application {
     }
   }
 
-    def PrintTeacher(teach: Teacher): Unit = {
-      println(teach.name)
-      teach.classes.foreach(println(_))
+  def PrintTeacher(teach: Teacher): Unit = {
+    println(teach.name)
+    teach.classes.foreach(println(_))
+  }
+
+  def save(student: ArrayBuffer[Student], teacher: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
+    //opening up the files
+    val writerS = new PrintWriter(new File("Students.txt"))
+    val writerT = new PrintWriter(new File("Teachers.txt"))
+    val writerC = new PrintWriter(new File("Classes.txt"))
+    //converting objects to string
+    for (s <- student.distinct) {
+      var tempStr = s.name + " " + s.id.toString + " " + s.classes.mkString(",") + " " + s.grades.toList.mkString(";")
+      if(s != student.last)tempStr+="\n"
+      writerS.write(tempStr)
+    }
+    writerS.close()
+    for (c <- classes.distinct) {
+      var tempStr = c.name + " " + c.teacher + " " + c.students.mkString(",") + " " + c.grades.toList.mkString(";")
+      if(c != classes.last)tempStr+="\n"
+      writerC.write(tempStr)
+    }
+    writerC.close()
+    for (t <- teacher.distinct) {
+      var tempStr = t.name + " " + t.classes.mkString(",")
+      if(t != teacher.last)tempStr+="\n"
+      writerT.write(tempStr)
+    }
+    writerT.close()
+
+  }
+
+  def load() = {
+    // Loading function loads all the students teachers and classes from file
+    //Opeing up the respective files
+    val studentInfo = Source.fromFile("Students.txt").getLines().toList
+    val students = ArrayBuffer[Student]()
+
+    val teacherInfo = Source.fromFile("Teachers.txt").getLines().toList
+    val teachers = ArrayBuffer[Teacher]()
+
+    val classInfo = Source.fromFile("Classes.txt").getLines().toList
+    val classes = ArrayBuffer[Classes]()
+
+    //converting string to object
+    for (i <- studentInfo) {
+      val info = i.split(" ")
+      var values = info(3).split(";")
+      val m = scala.collection.mutable.Map[String, Int]()
+      for (i <- values) {
+        val key = i.substring(1, i.length - 1).split(",")
+        m(key(0)) = key(1).toInt
+      }
+      students += new Student(info(0), info(1).toInt, info(2).split(","), m)
     }
 
+    for (i <- teacherInfo) {
+      val info = i.split(" ")
+      val name = info(0)
+      val classes = info(1).split(",")
+      teachers += Teacher(name, classes)
+    }
+
+
+    for (i <- classInfo) {
+      val info = i.split(" ")
+      val values = info(3).split(";")
+      val m = scala.collection.mutable.Map[String, Int]()
+      for (i <- values) {
+
+        val key = i.substring(1, i.length - 1).split(",")
+        m(key(0)) = key(1).toInt
+      }
+      classes += new Classes(info(0), info(1), info(2).split(","), m)
+    }
+    (students, teachers, classes)
+  }
 }
