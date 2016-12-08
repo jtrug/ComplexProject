@@ -174,6 +174,7 @@ object Application {
             m(x) = StdIn.readInt()
         }
         classes += new Classes(name, teach, studs, m)
+        //remove a student
       case 4 =>
         doWhileLoop = false
         println("Remove Class by a Name: ")
@@ -195,15 +196,18 @@ object Application {
       case 0 =>
         MainMenu(students, teachers, classes)
 
+        //search for a student
       case 1 =>
         println("Enter the name of the teacher to search for")
         val search = StdIn.readLine()
         var searchResults = teachers.filter(_.name == search)
         searchResults.foreach(PrintTeacher(_))
 
+        //print teachers
       case 2 =>
         teachers.sortBy(_.name.toUpperCase).foreach(PrintTeacher(_))
 
+        //add teacher
       case 3 =>
         println("Enter the teacher's name: ")
         val tName = StdIn.readLine()
@@ -213,6 +217,7 @@ object Application {
         teachers += Teacher(tName, tClass.split(" *, *"))
 
         save(students, teachers, classes)
+        //remove teacher
       case 4 =>
         println("Remove Teacher by a Name: ")
         val search = StdIn.readLine()
@@ -228,6 +233,7 @@ object Application {
     println("Classes: " + teach.classes.mkString(" , "))
   }
 
+  //save the objects to file
   def save(student: ArrayBuffer[Student], teacher: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
     //opening up the files
     val writerS = new PrintWriter(new File("Students.txt"))
@@ -254,7 +260,7 @@ object Application {
     writerT.close()
 
   }
-
+  //loading the objects
   def load() = {
     // Loading function loads all the students teachers and classes from file
     //Opeing up the respective files
