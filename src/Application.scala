@@ -1,18 +1,18 @@
-import java.io.{File, PrintWriter}
+/**
+  * Nick Trefz
+  * Jared Bartrug
+  *
+  */
 
+import java.io.{File, PrintWriter}
 import scala.collection.mutable.ArrayBuffer
 import scala.io.StdIn
 import scala.io.Source
 
-/**
-  * Nick Trfz
-  * Jared Bartrug
-  *
-  */
 object Application {
   def main(args: Array[String]): Unit = {
-    val (students,teachers,classes) = load()
-    MainMenu(students,teachers,classes)
+    val (students, teachers, classes) = load()
+    MainMenu(students, teachers, classes)
   }
 
   def save(student: Array[Student], teacher: Array[Teacher], classes: Array[Classes]): Unit = {
@@ -39,7 +39,7 @@ object Application {
 
   def load() = {
     // Loading function loads all the students teachers and classes from file
-    //Opeing up the respective files
+    //Opening up the respective files
     val studentInfo = Source.fromFile("Students.txt").getLines().toList
     val students = ArrayBuffer[Student]()
 
@@ -64,7 +64,7 @@ object Application {
       val info = i.split(" ")
       val name = info(0)
       val classes = info(1).split(",")
-      teachers +=  Teacher(name, classes)
+      teachers += Teacher(name, classes)
     }
 
 
@@ -82,89 +82,158 @@ object Application {
     (students.toArray, teachers.toArray, classes.toArray)
   }
 
- def MainMenu(students:Array[Student],teachers:Array[Teacher],classes:Array[Classes]): Unit = {
-   println("School Database")
-   println("Please select a menu to enter\n1:Student\n2: Class\n3:Teacher")
-   val choice = StdIn.readInt()
-   choice match {
-     case 1 => // Student
-       StudentMainMenu(students,teachers,classes)
+  def MainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+    println("School Database")
+    println("Please select a menu to enter\n0: Exit Program\n1:Student\n2: Class\n3:Teacher")
+    val choice = StdIn.readInt()
+    choice match {
+      case 0 =>
+        save(students, teachers, classes)
+        sys.exit()
+      case 1 => // Student
+        StudentMainMenu(students, teachers, classes)
 
-     case 2 => //Class
-       ClassMainMenu(students,teachers,classes)
+      case 2 => //Class
+        ClassMainMenu(students, teachers, classes)
 
-     case 3 => //Teacher
+      case 3 => //Teacher
+        TeacherMainMenu(students, teachers, classes)
 
+      case _ =>
+        println("Invalid choice exiting")
+    }
+  }
 
-     case _ =>
-       println("Invalid choice exiting")
-   }
- }
-  def StudentMainMenu(students:Array[Student],teachers:Array[Teacher],classes:Array[Classes]): Unit = {
+  def StudentMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
     var firstChoice = 0
     var secondChoice = 0
-    var invalidChoice = false
+    var getOutOfWhileLoop = false
 
-    while (!invalidChoice) {
+    while (!getOutOfWhileLoop) {
       println("0: Back to main menu\n1: Search Students by name\n2: Search students by ID\n3: See all Students")
       firstChoice = StdIn.readInt()
 
       firstChoice match {
         case 0 =>
           //back to main menu
-          MainMenu(students,teachers,classes)
+          MainMenu(students, teachers, classes)
           sys.exit()
         case 1 =>
           //Search by name
-          invalidChoice = false
+          getOutOfWhileLoop = true
           println("Search for a Name: ")
           var name = StdIn.readLine()
 
         case 2 =>
-        // Search by ID
-          invalidChoice = false
+          // Search by ID
+          getOutOfWhileLoop = true
 
         case 3 =>
-        // Show all students
-          invalidChoice = false
+          // Show all students
+          getOutOfWhileLoop = true
 
         case _ =>
           println("Invalid choice.")
-          invalidChoice = true
+          getOutOfWhileLoop = false
       }
     }
     println("-1: Exit Program \n0: Return to main menu")
-      /*
-    Print the results
-     */
+    /** Print the results */
 
-      print("Select an option or student to view")
-      secondChoice = secondChoice
 
-      if (secondChoice == 0) {
-        //return to main menu
-        MainMenu(students,teachers,classes)
+    print("Select an option or student to view")
+    secondChoice = StdIn.readInt()
+
+    if (secondChoice == 0) {
+      //return to main menu
+      MainMenu(students, teachers, classes)
+      sys.exit()
+    }
+    else if (secondChoice == -1) {
+      // exit program
+      save(students, teachers, classes)
+      sys.exit()
+    }
+    else {
+      PrintStudent(students(secondChoice))
+
+    }
+
+  }
+
+  def PrintStudent(stud: Student): Unit = {
+    println("Name: " + stud.name)
+    println("Student ID: " + stud.id)
+    println("Classes: " + stud.classes.mkString(", "))
+    println("Grades: " + stud.grades)
+    println()
+  }
+
+  def PrintClass(clasz: Classes): Unit = {
+    println(clasz.name)
+    println(clasz.teacher)
+    println(clasz.students.mkString(", "))
+    println(clasz.grades)
+  }
+
+  def ClassMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+    println("Select an option: ")
+    println("0: Main Menu \n1: Search for a class \n2: View All Classes")
+    val option = StdIn.readInt()
+    var doWhileLoop = true
+
+    while (doWhileLoop) option match {
+      case 0 =>
+
+        /** Main Menu */
+        MainMenu(students, teachers, classes)
         sys.exit()
-      }
-      else if (secondChoice == -1) {
-        // exit program
-        save(students,teachers,classes)
-        sys.exit()
-      }
-      else {
-        //ShowStudent(secondChoice, arrayOfStudents)
-      }
 
+      case 1 =>
+
+        /** Search */
+        doWhileLoop = false
+        print("Enter the name of the class to search for: ")
+        val search = StdIn.readLine()
+        var resultArray = classes.filter(_.name == search)
+        resultArray.foreach(PrintClass(_))
+
+      case 2 =>
+
+        /** Show all classes */
+        doWhileLoop = false
+        classes.foreach(PrintClass(_))
+
+      case _ =>
+        println("Invalid Selection. Try again.")
+        doWhileLoop = true
+    } // end of while loop
   }
 
-  def ShowStudent(index: Int, array: Array[Student]): Unit = {
-    println("Name: " + array(index).name)
-    println("Student ID: " + array(index).id)
-    println("Classes: " + array(index).classes)
-    println("Grades: " + array(index).grades)
+  def TeacherMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
+    println("Select an option: ")
+    println("0: Return to Main Menu \n1: Search for Teacher by name \n2: View all Teachers")
+    val selection = StdIn.readInt()
+
+    selection match {
+      case 0 =>
+        MainMenu(students, teachers, classes)
+
+      case 1 =>
+        println("Enter the name of the teacher to search for")
+        val search = StdIn.readLine()
+        var searchResults = teachers.filter(_.name == search)
+        searchResults.foreach(PrintTeacher(_))
+
+      case 2 =>
+        teachers.foreach(PrintTeacher(_))
+    }
   }
-  def ClassMainMenu(students:Array[Student],teachers:Array[Teacher],classes:Array[Classes]): Unit = {
-    println("\nList of Classes:")
-    // print a list of all classes
-  }
+
+
+    def PrintTeacher(teach: Teacher): Unit = {
+      println(teach.name)
+      teach.classes.foreach(println(_))
+    }
+
 }
