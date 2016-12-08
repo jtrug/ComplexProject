@@ -1,2 +1,5 @@
-Hayhurst math
-matthew math math2
+Hayhurst:math
+matthew:math
+Tanner:C110,CS230,CS111
+josh:math
+adam:english
