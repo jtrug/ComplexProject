@@ -16,24 +16,30 @@ object Application {
   }
 
   def MainMenu(students: ArrayBuffer[Student], teachers: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
-    println("School Database")
-    println("Please select a menu to enter\n0: Exit Program\n1:Student\n2:Class\n3:Teacher")
-    val choice = StdIn.readInt()
-    choice match {
-      case 0 =>
-        save(students, teachers, classes)
-        sys.exit()
-      case 1 => // Student
-        StudentMainMenu(students, teachers, classes)
+    var exit = false
+    while (!exit) {
+      println("---School Database---")
+      println("Please select a menu to enter\n0: Exit Program\n1:Student\n2:Class\n3:Teacher")
+      val choice = StdIn.readInt()
+      println()
 
-      case 2 => //Class
-        ClassMainMenu(students, teachers, classes)
-
-      case 3 => //Teacher
-        TeacherMainMenu(students, teachers, classes)
-
-      case _ =>
-        println("Invalid choice exiting")
+      choice match {
+        case 0 =>
+          save(students, teachers, classes)
+          sys.exit()
+        case 1 => // Student
+          StudentMainMenu(students, teachers, classes)
+          exit = true
+        case 2 => //Class
+          ClassMainMenu(students, teachers, classes)
+          exit = true
+        case 3 => //Teacher
+          TeacherMainMenu(students, teachers, classes)
+          exit = true
+        case _ =>
+          println("Invalid Choice.\n")
+          exit = false
+      }
     }
   }
 
@@ -43,8 +49,10 @@ object Application {
     var getOutOfWhileLoop = false
 
     while (!getOutOfWhileLoop) {
-      println("0: Back to main menu\n1: Search Students by name\n2: Search students by ID\n3: See all Students\n4:Add a student\n5:Remove a student")
+      println("---Student Database Main Menu---")
+      println("0:Return to Main Menu\n1:Search Students by Name\n2:Search Students by ID\n3:See All Students\n4:Add a Student\n5:Remove a Student")
       firstChoice = StdIn.readInt()
+      println()
 
       firstChoice match {
         case 0 =>
@@ -55,19 +63,24 @@ object Application {
           getOutOfWhileLoop = true
           println("Search by a Name: ")
           val search = StdIn.readLine()
+          println()
           val results = students.filter(_.name == search)
           results.foreach(PrintStudent(_))
+
         case 2 =>
           // Search by ID
           getOutOfWhileLoop = true
           println("Search by an ID: ")
           val search = StdIn.readInt()
+          println()
           val results = students.filter(_.id == search)
           results.foreach(PrintStudent(_))
+
         case 3 =>
           // Show all students
           getOutOfWhileLoop = true
           students.sortBy(_.name.toUpperCase).foreach(PrintStudent(_))
+
         case 4 =>
           // add student
           getOutOfWhileLoop = true
@@ -83,38 +96,30 @@ object Application {
               m(x) = StdIn.readInt()
           }
           students += new Student(name, id, classes, m)
-        //remove a student
-        case 5 =>
+
+        case 5 =>  //remove a student
           getOutOfWhileLoop = true
           println("Remove by a Name: ")
           val search = StdIn.readLine()
           students.filter(_.name == search).foreach(students -= _)
+
         case _ =>
           println("Invalid choice.")
           getOutOfWhileLoop = false
       }
     }
-    println("-1: Exit Program \n0: Return to main menu\n1:Return to Student Menu")
-    /*
-  Print the results
-   */
-
-    print("Select an option")
+    println("Select an option")
+    println("0:Return to main menu\n1:Return to Student Menu")
     secondChoice = StdIn.readInt()
+    println()
 
     if (secondChoice == 0) {
       //return to main menu
       MainMenu(students, teachers, classes)
       sys.exit()
     }
-    else if (secondChoice == -1) {
-      // exit program
-      save(students, teachers, classes)
-      sys.exit()
-    }
     else {
       StudentMainMenu(students, teachers, classes)
-
     }
 
   }
@@ -132,11 +137,12 @@ object Application {
     println("Teacher: " + clasz.teacher)
     println("Students: " + clasz.students.mkString(", "))
     println("Grades: " + clasz.grades.mkString(", "))
+    println()
   }
 
   def ClassMainMenu(students: ArrayBuffer[Student], teachers: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
-    println("Select an option: ")
-    println("0: Main Menu \n1: Search for a class \n2: View All Classes\n3:Add a Class\n4:Remove a Class")
+    println("---Class Database Main Menu---")
+    println("0:Return to Main Menu \n1:Search for a Class \n2:View All Classes\n3:Add a Class\n4:Remove a Class")
     val option = StdIn.readInt()
     var doWhileLoop = true
 
@@ -151,7 +157,8 @@ object Application {
         doWhileLoop = false
         print("Enter the name of the class to search for: ")
         val search = StdIn.readLine()
-        var resultArray = classes.filter(_.name == search)
+        println()
+        val resultArray = classes.filter(_.name == search)
         resultArray.foreach(PrintClass(_))
 
       case 2 =>
@@ -159,6 +166,8 @@ object Application {
         /** Show all classes */
         doWhileLoop = false
         classes.sortBy(_.name.toUpperCase).foreach(PrintClass(_))
+        println()
+
       case 3 =>
         // add student
         doWhileLoop = false
@@ -174,23 +183,26 @@ object Application {
             m(x) = StdIn.readInt()
         }
         classes += new Classes(name, teach, studs, m)
-        //remove a student
-      case 4 =>
+        println()
+
+
+      case 4 => //remove a student
         doWhileLoop = false
         println("Remove Class by a Name: ")
         val search = StdIn.readLine()
         classes.filter(_.name == search).foreach(classes -= _)
       case _ =>
-        println("Invalid Selection. Try again.")
+        println("Invalid Selection. Try again.\n")
         doWhileLoop = true
-    } // end of while loop
+    }
     ClassMainMenu(students, teachers, classes)
   }
 
   def TeacherMainMenu(students: ArrayBuffer[Student], teachers: ArrayBuffer[Teacher], classes: ArrayBuffer[Classes]): Unit = {
-    println("Select an option: ")
-    println("0: Return to Main Menu \n1: Search for Teacher by name \n2: View all Teachers \n3: Add a teacher\n4:Remove a Teacher")
+    println("---Teacher Database Main Menu---")
+    println("0:Return to Main Menu \n1:Search for Teacher by name \n2:View all Teachers \n3:Add a teacher\n4:Remove a Teacher")
     val selection = StdIn.readInt()
+    println()
 
     selection match {
       case 0 =>
@@ -200,7 +212,8 @@ object Application {
       case 1 =>
         println("Enter the name of the teacher to search for")
         val search = StdIn.readLine()
-        var searchResults = teachers.filter(_.name == search)
+        println()
+        val searchResults = teachers.filter(_.name == search)
         searchResults.foreach(PrintTeacher(_))
 
         //print teachers
@@ -213,17 +226,19 @@ object Application {
         val tName = StdIn.readLine()
         println("Enter the teacher's classes separated by commas: ")
         val tClass = StdIn.readLine()
+        println()
 
         teachers += Teacher(tName, tClass.split(" *, *"))
 
         save(students, teachers, classes)
-        //remove teacher
-      case 4 =>
+
+
+      case 4 => //remove teacher
         println("Remove Teacher by a Name: ")
         val search = StdIn.readLine()
         teachers.filter(_.name == search).foreach(teachers -= _)
       case _ =>
-        println("Invalid choice please try again")
+        println("Invalid choice please try again.\n")
     }
     TeacherMainMenu(students, teachers, classes)
   }
@@ -231,6 +246,7 @@ object Application {
   def PrintTeacher(teach: Teacher): Unit = {
     print("Teacher: " + teach.name + "   ")
     println("Classes: " + teach.classes.mkString(" , "))
+    println()
   }
 
   //save the objects to file
@@ -263,7 +279,7 @@ object Application {
   //loading the objects
   def load() = {
     // Loading function loads all the students teachers and classes from file
-    //Opeing up the respective files
+    //Opening up the respective files
     val studentInfo = Source.fromFile("Students.txt").getLines().toList
     val students = ArrayBuffer[Student]()
 
