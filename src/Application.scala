@@ -212,7 +212,7 @@ object Application {
 
   def TeacherMainMenu(students: Array[Student], teachers: Array[Teacher], classes: Array[Classes]): Unit = {
     println("Select an option: ")
-    println("0: Return to Main Menu \n1: Search for Teacher by name \n2: View all Teachers")
+    println("0: Return to Main Menu \n1: Search for Teacher by name \n2: View all Teachers \n3: Add a teacher")
     val selection = StdIn.readInt()
 
     selection match {
@@ -227,9 +227,22 @@ object Application {
 
       case 2 =>
         teachers.foreach(PrintTeacher(_))
+
+      case 3 =>
+        println("Enter the teacher's name: ")
+        val tName = StdIn.readLine()
+        println("Enter the class the teacher's class: ")
+    val tClass = StdIn.readLine()
+        val tClassArr = Array(tClass)
+
+        val newTeach = new Teacher(tName, tClassArr)
+        val newTeachArray = Array(newTeach)
+        teachers.copyToArray(newTeachArray)
+
+        save(students, newTeachArray, classes)
+        MainMenu(students, newTeachArray, classes)
     }
   }
-
 
     def PrintTeacher(teach: Teacher): Unit = {
       println(teach.name)
